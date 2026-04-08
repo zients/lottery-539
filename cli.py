@@ -42,9 +42,10 @@ def cmd_stats(lottery_type: str = "539") -> None:
     if not draws:
         console.print("[red]No data. Run: python cli.py update[/red]")
         return
-    draw_list = list(draws)
     cfg = LOTTERY_CONFIG[lottery_type]
     num_range = cfg["num_range"]
+    analyze_count = cfg["analyze_count"]
+    draw_list = [(d, nums[:analyze_count]) for d, nums in draws]
 
     freq = frequency(draw_list, num_range)
     hot = hot_numbers(draw_list, num_range=num_range)
@@ -68,8 +69,9 @@ def cmd_recommend(lottery_type: str = "539") -> None:
     if not draws:
         console.print("[red]No data. Run: python cli.py update[/red]")
         return
-    draw_list = list(draws)
-    combos = recommend(draw_list, LOTTERY_CONFIG[lottery_type])
+    cfg = LOTTERY_CONFIG[lottery_type]
+    draw_list = [(d, nums[:cfg["analyze_count"]]) for d, nums in draws]
+    combos = recommend(draw_list, cfg)
     console.print(f"\n[bold green]{LOTTERY_TYPES[lottery_type]} 推薦號碼：[/bold green]")
     for i, combo in enumerate(combos, 1):
         nums = "  ".join(str(n) for n in combo)
