@@ -9,6 +9,7 @@ env/
 *.egg-info/
 dist/
 build/
+.python-version
 
 # Data
 data/*.db
