@@ -23,26 +23,26 @@ LOTTERY_TYPES = {
 
 def cmd_update(start_month: str | None = None, lottery_type: str = "539") -> None:
     init_db(DB_PATH)
-    existing = {row[0] for row in get_all_draws(DB_PATH)}
+    existing = {row[0] for row in get_all_draws(DB_PATH, lottery_type)}
     # auto-detect start month from latest DB record if not specified
     if start_month is None and existing:
         latest = max(existing)
         start_month = latest[:7]  # "YYYY-MM-DD" → "YYYY-MM"
-    draws = fetch_draws(start_month=start_month)
+    draws = fetch_draws(start_month=start_month, lottery_type=lottery_type)
     new_count = 0
     for date, numbers in draws:
         if date not in existing:
-            insert_draw(DB_PATH, date, numbers)
+            insert_draw(DB_PATH, date, numbers, lottery_type)
             new_count += 1
     console.print(f"[green]{new_count} new draw(s) saved.[/green]")
 
 
 def cmd_stats(lottery_type: str = "539") -> None:
-    draws = get_all_draws(DB_PATH)
+    draws = get_all_draws(DB_PATH, lottery_type)
     if not draws:
         console.print("[red]No data. Run: python cli.py update[/red]")
         return
-    draw_list = [(row[0], list(row[1:])) for row in draws]
+    draw_list = list(draws)
 
     freq = frequency(draw_list)
     hot = hot_numbers(draw_list)
@@ -62,11 +62,11 @@ def cmd_stats(lottery_type: str = "539") -> None:
 
 
 def cmd_recommend(lottery_type: str = "539") -> None:
-    draws = get_all_draws(DB_PATH)
+    draws = get_all_draws(DB_PATH, lottery_type)
     if not draws:
         console.print("[red]No data. Run: python cli.py update[/red]")
         return
-    draw_list = [(row[0], list(row[1:])) for row in draws]
+    draw_list = list(draws)
     combos = recommend(draw_list)
     console.print("\n[bold green]推薦號碼：[/bold green]")
     for i, combo in enumerate(combos, 1):
