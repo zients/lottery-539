@@ -42,3 +42,20 @@ def test_stats_runs_without_error(seeded_db):
 def test_recommend_runs_without_error(seeded_db):
     with patch("cli.DB_PATH", seeded_db):
         cmd_recommend()
+
+
+def test_update_accepts_lottery_type(db):
+    mock_draws = [("2024-01-01", [1, 2, 3, 4, 5])]
+    with patch("cli.fetch_draws", return_value=mock_draws), patch("cli.DB_PATH", db):
+        cmd_update(start_month="2024-01", lottery_type="649")
+    assert len(get_all_draws(db)) == 1
+
+
+def test_stats_accepts_lottery_type(seeded_db):
+    with patch("cli.DB_PATH", seeded_db):
+        cmd_stats(lottery_type="649")
+
+
+def test_recommend_accepts_lottery_type(seeded_db):
+    with patch("cli.DB_PATH", seeded_db):
+        cmd_recommend(lottery_type="649")

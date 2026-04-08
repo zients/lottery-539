@@ -10,8 +10,18 @@ from analyzer.analyzer import frequency, hot_numbers, cold_numbers, recommend
 DB_PATH = os.environ.get("LOTTERY_DB", "data/lottery.db")
 console = Console()
 
+LOTTERY_TYPES = {
+    "539": "今彩539",
+    "649": "大樂透",
+    "638": "威力彩",
+    "3d":  "3星彩",
+    "4d":  "4星彩",
+    "49m6": "49樂合彩",
+    "39m5": "39樂合彩",
+}
 
-def cmd_update(start_month: str | None = None) -> None:
+
+def cmd_update(start_month: str | None = None, lottery_type: str = "539") -> None:
     init_db(DB_PATH)
     existing = {row[0] for row in get_all_draws(DB_PATH)}
     # auto-detect start month from latest DB record if not specified
@@ -27,7 +37,7 @@ def cmd_update(start_month: str | None = None) -> None:
     console.print(f"[green]{new_count} new draw(s) saved.[/green]")
 
 
-def cmd_stats() -> None:
+def cmd_stats(lottery_type: str = "539") -> None:
     draws = get_all_draws(DB_PATH)
     if not draws:
         console.print("[red]No data. Run: python cli.py update[/red]")
@@ -51,7 +61,7 @@ def cmd_stats() -> None:
     console.print(f"[bold blue]冷號（近30期）：[/bold blue] {', '.join(f'{n:02d}' for n in cold)}")
 
 
-def cmd_recommend() -> None:
+def cmd_recommend(lottery_type: str = "539") -> None:
     draws = get_all_draws(DB_PATH)
     if not draws:
         console.print("[red]No data. Run: python cli.py update[/red]")
@@ -68,20 +78,27 @@ def main():
     parser = argparse.ArgumentParser(description="台灣539分析工具")
     subparsers = parser.add_subparsers(dest="command")
 
+    type_choices = list(LOTTERY_TYPES.keys())
+    type_help = "彩種：" + "、".join(f"{k}={v}" for k, v in LOTTERY_TYPES.items()) + "（預設：539）"
+
     update_p = subparsers.add_parser("update", help="更新開獎資料")
     update_p.add_argument("--from-month", type=str, default=None,
                           help="起始月份 YYYY-MM，預設自動從最新資料繼續")
+    update_p.add_argument("--type", type=str, default="539", choices=type_choices, help=type_help)
 
-    subparsers.add_parser("stats", help="查看統計")
-    subparsers.add_parser("recommend", help="產生推薦號碼")
+    stats_p = subparsers.add_parser("stats", help="查看統計")
+    stats_p.add_argument("--type", type=str, default="539", choices=type_choices, help=type_help)
+
+    rec_p = subparsers.add_parser("recommend", help="產生推薦號碼")
+    rec_p.add_argument("--type", type=str, default="539", choices=type_choices, help=type_help)
 
     args = parser.parse_args()
     if args.command == "update":
-        cmd_update(start_month=args.from_month)
+        cmd_update(start_month=args.from_month, lottery_type=args.type)
     elif args.command == "stats":
-        cmd_stats()
+        cmd_stats(lottery_type=args.type)
     elif args.command == "recommend":
-        cmd_recommend()
+        cmd_recommend(lottery_type=args.type)
     else:
         parser.print_help()
 
