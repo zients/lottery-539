@@ -11,10 +11,14 @@ DB_PATH = os.environ.get("LOTTERY_DB", "data/lottery.db")
 console = Console()
 
 
-def cmd_update(pages: int = 10) -> None:
+def cmd_update(start_month: str | None = None) -> None:
     init_db(DB_PATH)
     existing = {row[0] for row in get_all_draws(DB_PATH)}
-    draws = fetch_draws(pages=pages)
+    # auto-detect start month from latest DB record if not specified
+    if start_month is None and existing:
+        latest = max(existing)
+        start_month = latest[:7]  # "YYYY-MM-DD" → "YYYY-MM"
+    draws = fetch_draws(start_month=start_month)
     new_count = 0
     for date, numbers in draws:
         if date not in existing:
@@ -65,14 +69,15 @@ def main():
     subparsers = parser.add_subparsers(dest="command")
 
     update_p = subparsers.add_parser("update", help="更新開獎資料")
-    update_p.add_argument("--pages", type=int, default=10)
+    update_p.add_argument("--from-month", type=str, default=None,
+                          help="起始月份 YYYY-MM，預設自動從最新資料繼續")
 
     subparsers.add_parser("stats", help="查看統計")
     subparsers.add_parser("recommend", help="產生推薦號碼")
 
     args = parser.parse_args()
     if args.command == "update":
-        cmd_update(pages=args.pages)
+        cmd_update(start_month=args.from_month)
     elif args.command == "stats":
         cmd_stats()
     elif args.command == "recommend":

@@ -19,9 +19,10 @@ def test_parse_draws_returns_list():
 
 def test_parse_draws_structure():
     draws = parse_draws(load_fixture())
+    # API returns newest-first; fixture has 3 items
     date, numbers = draws[0]
-    assert date == "2007-01-01"
-    assert numbers == [9, 11, 27, 28, 38]
+    assert date == "2007-01-03"
+    assert numbers == [22, 23, 27, 29, 30]
 
 
 def test_parse_draws_all_numbers_in_range():
@@ -33,17 +34,28 @@ def test_parse_draws_all_numbers_in_range():
 
 def test_fetch_draws_calls_api():
     mock_response = MagicMock()
-    mock_response.text = FIXTURE_PATH.read_text(encoding="utf-8")
-    with patch("scraper.scraper.requests.post", return_value=mock_response) as mock_post:
-        result = fetch_draws(pages=1)
-    mock_post.assert_called_once()
-    assert len(result) == 3
+    mock_response.json.return_value = {"content": load_fixture()}
+    with patch("scraper.scraper.requests.get", return_value=mock_response) as mock_get:
+        result = fetch_draws(start_month="2007-01")
+    mock_get.assert_called()
+    assert len(result) >= 3
 
 
 def test_fetch_draws_stops_on_empty():
-    empty = json.dumps({"lotto": []})
     mock_response = MagicMock()
-    mock_response.text = empty
-    with patch("scraper.scraper.requests.post", return_value=mock_response):
-        result = fetch_draws(pages=5)
+    mock_response.json.return_value = {"content": {"totalSize": 0, "daily539Res": []}}
+    with patch("scraper.scraper.requests.get", return_value=mock_response):
+        result = fetch_draws(start_month="2007-01")
     assert result == []
+
+
+def test_fetch_draws_sorted_oldest_first():
+    # fixture has items newest-first; fetch_draws should return oldest-first
+    from datetime import date
+    current = f"{date.today().year}-{date.today().month:02d}"
+    mock_response = MagicMock()
+    mock_response.json.return_value = {"content": load_fixture()}
+    with patch("scraper.scraper.requests.get", return_value=mock_response):
+        result = fetch_draws(start_month=current)
+    dates = [r[0] for r in result]
+    assert dates == sorted(dates)

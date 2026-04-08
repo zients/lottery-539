@@ -1,50 +1,68 @@
 # scraper/scraper.py
-import json
 import requests
+from datetime import date, datetime
 
-API_URL = "https://www.pilio.idv.tw/Json_lto.asp"
+API_URL = "https://api.taiwanlottery.com/TLCAPIWeB/Lottery/Daily539Result"
+HEADERS = {"Accept": "application/json", "User-Agent": "Mozilla/5.0"}
+START_YEAR, START_MONTH = 2007, 1
 
 
 def parse_draws(data: dict) -> list[tuple[str, list[int]]]:
-    """Parse draw records from pilio JSON response.
+    """Parse draw records from official Taiwan Lottery API response.
 
     Expected item format:
-        {"date": "2007/01/01<br>(一)", "num": "09, 11, 27, 28, 38", "dex": "1"}
+        {"lotteryDate": "2026-04-07T00:00:00", "drawNumberSize": [4, 8, 21, 27, 29], ...}
     """
     draws = []
-    for item in data.get("lotto", []):
+    for item in data.get("daily539Res") or []:
         try:
-            # "2007/01/01<br>(一)" → "2007-01-01"
-            raw_date = item["date"].split("<")[0].strip()
-            date = raw_date.replace("/", "-")
-
-            # "09, 11, 27, 28, 38" → [9, 11, 27, 28, 38]
-            numbers = [int(n.strip()) for n in item["num"].split(",")]
+            draw_date = item["lotteryDate"][:10]  # "2026-04-07T00:00:00" → "2026-04-07"
+            numbers = item["drawNumberSize"]       # already sorted
             if len(numbers) == 5 and all(1 <= n <= 39 for n in numbers):
-                draws.append((date, numbers))
-        except (KeyError, ValueError):
+                draws.append((draw_date, numbers))
+        except (KeyError, TypeError):
             continue
     return draws
 
 
-def fetch_draws(pages: int = 10) -> list[tuple[str, list[int]]]:
-    """Fetch draw history from pilio API.
+def fetch_draws(start_month: str | None = None) -> list[tuple[str, list[int]]]:
+    """Fetch all 539 draws from official API, month by month.
 
-    Each page returns 10 records; pagination uses the last dex value.
-    Ascending order (oldest first) with Ldesc=1.
+    Args:
+        start_month: "YYYY-MM" to start from. Defaults to "2007-01".
+
+    Returns:
+        List of (date, numbers) tuples, oldest first.
     """
+    if start_month:
+        year, month = int(start_month[:4]), int(start_month[5:7])
+    else:
+        year, month = START_YEAR, START_MONTH
+
+    today = date.today()
     all_draws = []
-    index = 0
-    for _ in range(pages):
-        response = requests.post(
+
+    while (year, month) <= (today.year, today.month):
+        month_str = f"{year}-{month:02d}"
+        response = requests.get(
             API_URL,
-            params={"Lkind": "lto539", "Lindex": index, "Ldesc": 1},
+            params={
+                "period": "",
+                "month": month_str,
+                "endMonth": month_str,
+                "pageNum": 1,
+                "pageSize": 31,
+            },
+            headers=HEADERS,
             timeout=10,
         )
-        data = json.loads(response.text)
+        data = response.json().get("content", {})
         batch = parse_draws(data)
-        if not batch:
-            break
-        all_draws.extend(batch)
-        index = int(data["lotto"][-1]["dex"])
+        all_draws.extend(sorted(batch))  # sort within month (API returns newest first)
+
+        month += 1
+        if month > 12:
+            month = 1
+            year += 1
+
     return all_draws
