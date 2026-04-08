@@ -4,7 +4,7 @@ import argparse
 from rich.console import Console
 from rich.table import Table
 from data.db import init_db, insert_draw, get_all_draws
-from scraper.scraper import fetch_draws
+from scraper.scraper import fetch_draws, LOTTERY_CONFIG
 from analyzer.analyzer import frequency, hot_numbers, cold_numbers, recommend
 
 DB_PATH = os.environ.get("LOTTERY_DB", "data/lottery.db")
@@ -43,22 +43,24 @@ def cmd_stats(lottery_type: str = "539") -> None:
         console.print("[red]No data. Run: python cli.py update[/red]")
         return
     draw_list = list(draws)
+    cfg = LOTTERY_CONFIG[lottery_type]
+    num_range = cfg["num_range"]
 
-    freq = frequency(draw_list)
-    hot = hot_numbers(draw_list)
-    cold = cold_numbers(draw_list)
+    freq = frequency(draw_list, num_range)
+    hot = hot_numbers(draw_list, num_range=num_range)
+    cold = cold_numbers(draw_list, num_range=num_range)
 
-    console.print(f"\n[bold]總期數：[/bold]{len(draw_list)}")
+    console.print(f"\n[bold]彩種：[/bold]{LOTTERY_TYPES[lottery_type]}  [bold]總期數：[/bold]{len(draw_list)}")
 
     table = Table(title="號碼頻率 Top 10")
     table.add_column("號碼", style="cyan")
     table.add_column("出現次數", style="magenta")
     for n, c in sorted(freq.items(), key=lambda x: x[1], reverse=True)[:10]:
-        table.add_row(f"{n:02d}", str(c))
+        table.add_row(str(n), str(c))
     console.print(table)
 
-    console.print(f"\n[bold yellow]熱號（近30期）：[/bold yellow] {', '.join(f'{n:02d}' for n in hot)}")
-    console.print(f"[bold blue]冷號（近30期）：[/bold blue] {', '.join(f'{n:02d}' for n in cold)}")
+    console.print(f"\n[bold yellow]熱號（近30期）：[/bold yellow] {', '.join(str(n) for n in hot)}")
+    console.print(f"[bold blue]冷號（近30期）：[/bold blue] {', '.join(str(n) for n in cold)}")
 
 
 def cmd_recommend(lottery_type: str = "539") -> None:
@@ -67,10 +69,10 @@ def cmd_recommend(lottery_type: str = "539") -> None:
         console.print("[red]No data. Run: python cli.py update[/red]")
         return
     draw_list = list(draws)
-    combos = recommend(draw_list)
-    console.print("\n[bold green]推薦號碼：[/bold green]")
+    combos = recommend(draw_list, LOTTERY_CONFIG[lottery_type])
+    console.print(f"\n[bold green]{LOTTERY_TYPES[lottery_type]} 推薦號碼：[/bold green]")
     for i, combo in enumerate(combos, 1):
-        nums = "  ".join(f"{n:02d}" for n in combo)
+        nums = "  ".join(str(n) for n in combo)
         console.print(f"  組合 {i}：{nums}")
 
 

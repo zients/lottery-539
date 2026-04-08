@@ -14,6 +14,9 @@ LOTTERY_CONFIG: dict[str, dict] = {
         "num_count": 5,
         "num_range": (1, 39),
         "start": (2007, 1),
+        "analyze_count": 5,
+        "odd_range": (2, 3),
+        "sum_range": (80, 120),
     },
     "649": {
         "path": "Lotto649Result",
@@ -22,6 +25,9 @@ LOTTERY_CONFIG: dict[str, dict] = {
         "num_count": 6,
         "num_range": (1, 49),
         "start": (2007, 1),
+        "analyze_count": 6,
+        "odd_range": (2, 4),
+        "sum_range": (90, 200),
     },
     "638": {
         "path": "SuperLotto638Result",
@@ -30,6 +36,9 @@ LOTTERY_CONFIG: dict[str, dict] = {
         "num_count": 7,   # 6 regular + 1 special (stored as flat list, special is last)
         "num_range": (1, 38),
         "start": (2008, 1),
+        "analyze_count": 6,  # analyze only the 6 regular balls
+        "odd_range": (2, 4),
+        "sum_range": (70, 165),
     },
     "3d": {
         "path": "3DResult",
@@ -38,6 +47,9 @@ LOTTERY_CONFIG: dict[str, dict] = {
         "num_count": 3,
         "num_range": (0, 9),
         "start": (2007, 1),
+        "analyze_count": 3,
+        "odd_range": None,  # digit games: skip odd/even filter
+        "sum_range": None,
     },
     "4d": {
         "path": "4DResult",
@@ -46,6 +58,9 @@ LOTTERY_CONFIG: dict[str, dict] = {
         "num_count": 4,
         "num_range": (0, 9),
         "start": (2007, 1),
+        "analyze_count": 4,
+        "odd_range": None,
+        "sum_range": None,
     },
     "49m6": {
         "path": "49M6Result",
@@ -54,6 +69,9 @@ LOTTERY_CONFIG: dict[str, dict] = {
         "num_count": 6,
         "num_range": (1, 49),
         "start": (2007, 1),
+        "analyze_count": 6,
+        "odd_range": (2, 4),
+        "sum_range": (90, 200),
     },
     "39m5": {
         "path": "39M5Result",
@@ -62,6 +80,9 @@ LOTTERY_CONFIG: dict[str, dict] = {
         "num_count": 5,
         "num_range": (1, 39),
         "start": (2011, 1),
+        "analyze_count": 5,
+        "odd_range": (2, 3),
+        "sum_range": (80, 120),
     },
 }
 
