@@ -25,14 +25,14 @@ uv sync
 ### 更新資料
 
 ```bash
-uv run python cli.py update --type 539              # DB 有資料則繼續，沒有則從最早期數開始
-uv run python cli.py update --type 649 --from-month 2024-01  # 指定起始月份
+uv run lottery update --type 539              # DB 有資料則繼續，沒有則從最早期數開始
+uv run lottery update --type 649 --from-month 2024-01  # 指定起始月份
 ```
 
 ### 統計分析
 
 ```bash
-uv run python cli.py stats --type 539
+uv run lottery stats --type 539
 ```
 
 輸出：
@@ -43,7 +43,7 @@ uv run python cli.py stats --type 539
 ### 號碼推薦
 
 ```bash
-uv run python cli.py recommend --type 638
+uv run lottery recommend --type 638
 ```
 
 輸出 3 組推薦號碼，依據：
