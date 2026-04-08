@@ -28,7 +28,6 @@ LOTTERY_CONFIG: dict[str, dict] = {
         "analyze_count": 6,
         "odd_range": (2, 4),
         "sum_range": (90, 200),
-        "special_range": (1, 49),
     },
     "638": {
         "path": "SuperLotto638Result",

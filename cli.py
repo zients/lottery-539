@@ -63,6 +63,17 @@ def cmd_stats(lottery_type: str = "539") -> None:
     console.print(f"\n[bold yellow]熱號（近30期）：[/bold yellow] {', '.join(str(n) for n in hot)}")
     console.print(f"[bold blue]冷號（近30期）：[/bold blue] {', '.join(str(n) for n in cold)}")
 
+    special_range = cfg.get("special_range")
+    if special_range:
+        special_draws = [(d, [nums[-1]]) for d, nums in draws if nums]
+        special_freq = frequency(special_draws, special_range)
+        sp_table = Table(title=f"特別號頻率 Top 5（範圍 {special_range[0]}-{special_range[1]}）")
+        sp_table.add_column("號碼", style="cyan")
+        sp_table.add_column("出現次數", style="magenta")
+        for n, c in sorted(special_freq.items(), key=lambda x: x[1], reverse=True)[:5]:
+            sp_table.add_row(str(n), str(c))
+        console.print(sp_table)
+
 
 def cmd_recommend(lottery_type: str = "539") -> None:
     draws = get_all_draws(DB_PATH, lottery_type)
