@@ -45,10 +45,10 @@ def test_recommend_runs_without_error(seeded_db):
 
 
 def test_update_accepts_lottery_type(db):
-    mock_draws = [("2024-01-01", [1, 2, 3, 4, 5])]
+    mock_draws = [("2024-01-01", [1, 2, 3, 4, 5, 6])]
     with patch("cli.fetch_draws", return_value=mock_draws), patch("cli.DB_PATH", db):
         cmd_update(start_month="2024-01", lottery_type="649")
-    assert len(get_all_draws(db)) == 1
+    assert len(get_all_draws(db, "649")) == 1
 
 
 def test_stats_accepts_lottery_type(seeded_db):

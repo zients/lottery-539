@@ -17,8 +17,8 @@ def test_insert_and_get_all(tmp_path):
     insert_draw(db_path, "2024-01-02", [6, 7, 8, 9, 10])
     rows = get_all_draws(db_path)
     assert len(rows) == 2
-    assert rows[0] == ("2024-01-01", 1, 2, 3, 4, 5)
-    assert rows[1] == ("2024-01-02", 6, 7, 8, 9, 10)
+    assert rows[0] == ("2024-01-01", [1, 2, 3, 4, 5])
+    assert rows[1] == ("2024-01-02", [6, 7, 8, 9, 10])
 
 def test_get_recent_draws(tmp_path):
     db_path = str(tmp_path / "test.db")
