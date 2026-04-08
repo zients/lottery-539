@@ -19,15 +19,21 @@ def seeded_db(db):
 def test_update_inserts_new_draws(db):
     mock_draws = [("2024-01-01", [1, 2, 3, 4, 5])]
     with patch("cli.fetch_draws", return_value=mock_draws), patch("cli.DB_PATH", db):
-        cmd_update()
+        cmd_update(start_month="2024-01")
     assert len(get_all_draws(db)) == 1
 
 def test_update_skips_duplicates(db):
     mock_draws = [("2024-01-01", [1, 2, 3, 4, 5])]
     with patch("cli.fetch_draws", return_value=mock_draws), patch("cli.DB_PATH", db):
-        cmd_update()
-        cmd_update()
+        cmd_update(start_month="2024-01")
+        cmd_update(start_month="2024-01")
     assert len(get_all_draws(db)) == 1
+
+def test_update_auto_detects_start_month(seeded_db):
+    mock_draws = [("2024-01-11", [5, 6, 7, 8, 9])]
+    with patch("cli.fetch_draws", return_value=mock_draws), patch("cli.DB_PATH", seeded_db):
+        cmd_update()  # no start_month - should auto-detect from DB
+    assert len(get_all_draws(seeded_db)) == 11
 
 def test_stats_runs_without_error(seeded_db):
     with patch("cli.DB_PATH", seeded_db):

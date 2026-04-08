@@ -1,5 +1,8 @@
-{ "lotto" : [
-  { "date":"2007/01/01<br>(一)" , "num":"09, 11, 27, 28, 38" , "sp":"" , "dex":"1" },
-  { "date":"2007/01/02<br>(二)" , "num":"02, 12, 33, 36, 37" , "sp":"" , "dex":"2" },
-  { "date":"2007/01/03<br>(三)" , "num":"22, 23, 27, 29, 30" , "sp":"" , "dex":"3" }
-]}
+{
+  "totalSize": 3,
+  "daily539Res": [
+    {"period": 96000003, "lotteryDate": "2007-01-03T00:00:00", "drawNumberSize": [22, 23, 27, 29, 30], "drawNumberAppear": [22, 23, 27, 29, 30], "sellAmount": 1000000, "totalAmount": 500000},
+    {"period": 96000002, "lotteryDate": "2007-01-02T00:00:00", "drawNumberSize": [2, 12, 33, 36, 37], "drawNumberAppear": [2, 12, 33, 36, 37], "sellAmount": 1000000, "totalAmount": 500000},
+    {"period": 96000001, "lotteryDate": "2007-01-01T00:00:00", "drawNumberSize": [9, 11, 27, 28, 38], "drawNumberAppear": [9, 11, 27, 28, 38], "sellAmount": 1000000, "totalAmount": 500000}
+  ]
+}
