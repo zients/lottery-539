@@ -1,16 +1,55 @@
-# lottery-539
+# tw-lottery-recommandation
 
-台灣今彩539歷史開獎資料分析與號碼推薦工具。
+台灣彩券開獎資料分析與號碼推薦工具，支援多種彩券。
 
-透過統計分析（頻率、熱號、冷號、奇偶比等），產生號碼推薦組合供參考。
+資料來源：[台灣彩券官方 API](https://api.taiwanlottery.com)
+
+## 支援彩種
+
+| `--type` | 彩種 | 玩法 |
+|----------|------|------|
+| `539` | 今彩539 | 5 球，1-39 |
+| `649` | 大樂透 | 6 球，1-49 |
+| `638` | 威力彩 | 6 球（1-38）+ 特別號（1-8） |
+| `3d` | 3星彩 | 3 位數，0-9 |
+| `4d` | 4星彩 | 4 位數，0-9 |
+
+## 安裝
+
+```bash
+pip install -r requirements.txt
+```
 
 ## 使用方式
 
+### 更新資料
+
 ```bash
-python cli.py update        # 更新最新開獎資料
-python cli.py stats         # 查看統計資訊
-python cli.py recommend     # 產生推薦號碼
+python cli.py update --type 539              # 從最新資料繼續抓
+python cli.py update --type 649 --from-month 2024-01  # 指定起始月份
 ```
+
+### 統計分析
+
+```bash
+python cli.py stats --type 539
+```
+
+輸出：
+- 全期號碼頻率 Top 10
+- 近 30 期熱號 / 冷號
+- 638 額外顯示特別號頻率 Top 5
+
+### 號碼推薦
+
+```bash
+python cli.py recommend --type 638
+```
+
+輸出 3 組推薦號碼，依據：
+- 歷史頻率（取 Top 20 候選）
+- 奇偶比與總和範圍過濾（539 / 649 / 638）
+- 638 附帶特別號推薦
 
 ## License
 
