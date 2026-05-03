@@ -1,57 +1,66 @@
 # tw-lottery-recommandation
 
-台灣彩券開獎資料分析與號碼推薦工具，支援多種彩券。
+Taiwan lottery draw analyzer & number recommender with a Transformer ML model. Supports multiple lottery types.
 
-資料來源：[台灣彩券官方 API](https://api.taiwanlottery.com)
+Data source: [Taiwan Lottery official API](https://api.taiwanlottery.com)
 
-## 支援彩種
+## Supported Lotteries
 
-| `--type` | 彩種 | 玩法 |
-|----------|------|------|
-| `539` | 今彩539 | 5 球，1-39 |
-| `649` | 大樂透 | 6 球，1-49 |
-| `638` | 威力彩 | 6 球（1-38）+ 特別號（1-8） |
-| `3d` | 3星彩 | 3 位數，0-9 |
-| `4d` | 4星彩 | 4 位數，0-9 |
+| `--type` | Name | Format |
+|----------|------|--------|
+| `539` | Daily 539 | Pick 5, range 1–39 |
+| `649` | Lotto 649 | Pick 6, range 1–49 |
+| `638` | Super Lotto 638 | Pick 6 (1–38) + bonus ball (1–8) |
+| `3d` | 3D Lottery | 3 digits, 0–9 |
+| `4d` | 4D Lottery | 4 digits, 0–9 |
 
-## 安裝
+## Installation
 
 ```bash
 uv sync
 ```
 
-## 使用方式
+## Usage
 
-### 更新資料
+### Update draw data
 
 ```bash
-uv run lottery update --type 539              # DB 有資料則繼續，沒有則從最早期數開始
-uv run lottery update --type 649 --from-month 2024-01  # 指定起始月份
+uv run lottery update --type 539                          # continues from latest DB record, or fetches from the beginning
+uv run lottery update --type 649 --from-month 2024-01    # specify a start month
 ```
 
-### 統計分析
+### Statistics
 
 ```bash
 uv run lottery stats --type 539
 ```
 
-輸出：
-- 全期號碼頻率 Top 10
-- 近 30 期熱號 / 冷號
-- 638 額外顯示特別號頻率 Top 5
+Output:
+- Top 10 most frequent numbers (all-time)
+- Hot / cold numbers (last 30 draws)
+- Bonus ball frequency Top 5 (638 only)
 
-### 號碼推薦
+### Number recommendation
 
 ```bash
 uv run lottery recommend --type 638
 ```
 
-輸出 3 組推薦號碼，依據：
-- 歷史頻率（取 Top 20 候選）
-- 奇偶比與總和範圍過濾（539 / 649 / 638）
-- 638 附帶特別號推薦
+Generates 3 recommended combinations based on:
+- Historical frequency (top 20 candidates)
+- Odd/even ratio and sum range filters (539 / 649 / 638)
+- Bonus ball recommendation (638 only)
+- Transformer ML model when a trained checkpoint is available
 
-### 執行測試
+### Train ML model
+
+```bash
+uv run lottery train --type 539 --epochs 100
+```
+
+Trains a Transformer model and saves the best checkpoint to `ml/checkpoints/`. Once trained, `recommend` will automatically use ML predictions.
+
+### Run tests
 
 ```bash
 uv run pytest
