@@ -8,7 +8,7 @@ license = { text = "MIT" }
 dependencies = [
     "numpy>=2.4.4",
     "requests>=2.33.1",
-    "rich>=14.3.3",
+    "rich>=15.0.0",
     "torch>=2.11.0",
 ]
 
