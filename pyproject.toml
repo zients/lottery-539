@@ -19,6 +19,11 @@ dev = [
 [project.scripts]
 lottery = "cli:main"
 
+[tool.pytest.ini_options]
+filterwarnings = [
+    "ignore:Failed to initialize NumPy:UserWarning",
+]
+
 [tool.uv]
 package = true
 
