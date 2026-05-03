@@ -65,7 +65,3 @@ Trains a Transformer model and saves the best checkpoint to `ml/checkpoints/`. O
 ```bash
 uv run pytest
 ```
-
-## License
-
-MIT
